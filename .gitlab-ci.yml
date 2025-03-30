@@ -1,0 +1,42 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  PROJECT_DIR: "streamlit_app"
+
+default:
+  image: python:3.10
+
+before_script:
+  - python -m venv venv
+  - source venv/bin/activate
+  - pip install --upgrade pip
+  - pip install -r $PROJECT_DIR/requirements.txt
+
+build-job:
+  stage: build
+  script:
+    - echo "✅ Build phase complete (no compile step needed for Python)."
+
+test-job:
+  stage: test
+  script:
+    - echo "🔍 Running model pipeline test..."
+    - cd $PROJECT_DIR
+    - python -c "from transformers import pipeline; gen = pipeline('text-generation', model='gpt2'); out = gen('Hello')[0]['generated_text']; print(out)"
+
+lint-job:
+  stage: test
+  script:
+    - pip install flake8
+    - echo "🧹 Running flake8 lint..."
+    - flake8 $PROJECT_DIR/app.py
+
+deploy-job:
+  stage: deploy
+  script:
+    - echo "🚀 This is a placeholder for deployment logic."
+    - echo "🖥️ You can deploy to Streamlit Cloud, Hugging Face Spaces, or another platform."
+  environment: production
